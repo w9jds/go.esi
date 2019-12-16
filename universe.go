@@ -2,6 +2,7 @@ package esi
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -44,14 +45,14 @@ type NameRef struct {
 
 // GetTypeIds get a list of all type ids in the game
 func (esi Client) GetTypeIds() ([]uint32, error) {
-	body, error := esi.get("/v1/universe/types/")
-	if error != nil {
-		return nil, error
+	body, err := esi.get("/v1/universe/types/")
+	if err != nil {
+		return nil, err
 	}
 
 	var typeIds []uint32
 	if err := json.Unmarshal(body, &typeIds); err != nil {
-		return nil, error
+		return nil, err
 	}
 
 	return typeIds, nil
@@ -59,14 +60,14 @@ func (esi Client) GetTypeIds() ([]uint32, error) {
 
 // GetType gets the types information from esi
 func (esi Client) GetType(id uint32) (*UniverseType, error) {
-	body, error := esi.get(fmt.Sprintf("/v3/universe/types/%d/", id))
-	if error != nil {
-		return nil, error
+	body, err := esi.get(fmt.Sprintf("/v3/universe/types/%d/", id))
+	if err != nil {
+		return nil, err
 	}
 
 	var item UniverseType
 	if err := json.Unmarshal(body, &item); err != nil {
-		return nil, error
+		return nil, err
 	}
 
 	return &item, nil
@@ -87,6 +88,10 @@ func (esi Client) GetNames(ids []uint32) (map[uint32]NameRef, error) {
 	var names []NameRef
 	if err := json.Unmarshal(body, &names); err != nil {
 		return nil, err
+	}
+
+	if len(ids) != len(names) {
+		return nil, errors.New("Names response didn't return same amount of items as original ids")
 	}
 
 	return mapNames(names), nil
