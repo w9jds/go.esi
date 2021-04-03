@@ -22,6 +22,13 @@ type victim struct {
 	DamageTaken   uint64     `json:"damage_taken,omitempty"`
 	Items         []KillItem `json:"items,omitempty"`
 	ShipTypeID    uint32     `json:"ship_type_id,omitempty"`
+	Position      position   `json:"position,omitempty"`
+}
+
+type position struct {
+	X float32 `json:"x,omitempty"`
+	Y float32 `json:"y,omitempty"`
+	Z float32 `json:"z,omitempty"`
 }
 
 type attacker struct {

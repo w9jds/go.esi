@@ -21,12 +21,12 @@ const baseURI = "https://esi.evetech.net"
 // CreateClient creates a new instance of the Client
 func CreateClient(httpClient *http.Client) *Client {
 	return &Client{
-		client: httpClient,
+		baseURI: baseURI,
+		client:  httpClient,
 	}
 }
 
 func attachHeaders(request *http.Request) *http.Request {
-	request.Header.Add("User-Agent", "Aura Discord Bot - Chingy Chonga/Jeremy Shore - w9jds@live.com")
 	request.Header.Add("Accept", "application/json")
 	return request
 }
@@ -66,7 +66,9 @@ func (esi Client) post(path string, content []byte) ([]byte, error) {
 func (esi Client) do(request *http.Request) ([]byte, error) {
 
 	for i := 0; i < 3; i++ {
+		delay := 5 * time.Second
 		response, error := esi.client.Do(request)
+
 		if error != nil {
 			log.Println(error)
 			continue
@@ -79,13 +81,19 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 			}
 
 			message, error := ioutil.ReadAll(response.Body)
+
+			if response.StatusCode == 420 {
+				// on error limited wait 60 seconds before proceeding
+				delay = 1 * time.Minute
+			}
+
 			if error != nil {
 				log.Println(error)
-				time.Sleep(5 * time.Second)
+				time.Sleep(delay)
 				continue
 			} else {
 				log.Println(string(message))
-				time.Sleep(5 * time.Second)
+				time.Sleep(delay)
 				continue
 			}
 		} else {
