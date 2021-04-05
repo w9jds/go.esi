@@ -39,7 +39,7 @@ type UniverseType struct {
 // NameRef is a reference to a name that is returned from esi
 type NameRef struct {
 	Category string `json:"category"`
-	ID       uint32 `json:"id"`
+	ID       uint   `json:"id"`
 	Name     string `json:"name"`
 }
 
@@ -74,7 +74,7 @@ func (esi Client) GetType(id uint32) (*UniverseType, error) {
 }
 
 // GetNames get a list of names from a list of ids
-func (esi Client) GetNames(ids []uint32) (map[uint32]NameRef, error) {
+func (esi Client) GetNames(ids []uint) (map[uint]NameRef, error) {
 	buffer, err := json.Marshal(ids)
 	if err != nil {
 		return nil, err
@@ -91,14 +91,14 @@ func (esi Client) GetNames(ids []uint32) (map[uint32]NameRef, error) {
 	}
 
 	if len(ids) != len(names) {
-		return nil, errors.New("Names response didn't return same amount of items as original ids")
+		return nil, errors.New("names response didn't return same amount of items as original ids")
 	}
 
 	return mapNames(names), nil
 }
 
-func mapNames(names []NameRef) map[uint32]NameRef {
-	references := map[uint32]NameRef{}
+func mapNames(names []NameRef) map[uint]NameRef {
+	references := map[uint]NameRef{}
 
 	for _, name := range names {
 		references[name.ID] = name

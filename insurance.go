@@ -3,7 +3,6 @@ package esi
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"reflect"
 )
 
@@ -30,7 +29,7 @@ type Coverage struct {
 
 // GetShipInsurance gets all insurance values and filters out anything that isn't for the specified ShipID
 func (esi Client) GetShipInsurance(shipID uint32) (*Coverage, error) {
-	body, error := esi.get(fmt.Sprintf("/v1/insurance/prices/"))
+	body, error := esi.get("/v1/insurance/prices/")
 	if error != nil {
 		return nil, error
 	}
@@ -46,7 +45,7 @@ func (esi Client) GetShipInsurance(shipID uint32) (*Coverage, error) {
 		}
 	}
 
-	return nil, errors.New("Insurance for specified shipID was not found")
+	return nil, errors.New("insurance for specified shipID was not found")
 }
 
 func buildCoverage(insurance insurance) *Coverage {

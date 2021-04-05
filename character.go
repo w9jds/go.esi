@@ -25,22 +25,22 @@ type CharacterDetails struct {
 type OnlineStatus struct {
 	LastLogin  string `json:"last_login,omitempty"`
 	LastLogout string `json:"last_logout,omitempty"`
-	Logins     uint32 `json:"logins,omitempty"`
+	Logins     uint   `json:"logins,omitempty"`
 	Online     bool   `json:"online"`
 }
 
 // Location reference to the location the character is currently located
 type Location struct {
-	SolarSystemID uint32 `json:"solar_system_id"`
-	StationID     uint32 `json:"station_id,omitempty"`
-	StructureID   uint32 `json:"structure_id,omitempty"`
+	SolarSystemID uint `json:"solar_system_id"`
+	StationID     uint `json:"station_id,omitempty"`
+	StructureID   uint `json:"structure_id,omitempty"`
 }
 
 // Ship entity is the ship that the character is currently in
 type Ship struct {
-	ShipItemID uint32 `json:"ship_item_id"`
+	ShipItemID uint   `json:"ship_item_id"`
 	ShipName   string `json:"ship_name"`
-	ShipTypeID uint32 `json:"ship_type_id"`
+	ShipTypeID uint   `json:"ship_type_id"`
 }
 
 // Affiliation represents a characters corp affiliations
@@ -55,14 +55,14 @@ type Affiliation struct {
 type Roles struct {
 	Roles      []string `json:"roles,omitempty"`
 	BaseRoles  []string `json:"roles_at_base,omitempty"`
-	HQRoles    []string `json:"roles_at_hq,omitmepty"`
+	HQRoles    []string `json:"roles_at_hq,omitempty"`
 	OtherRoles []string `json:"roles_at_other,omitempty"`
 }
 
 // Title represents a title
 type Title struct {
 	Name string `json:"name,omitempty"`
-	ID   uint32 `json:"title_id,omitemtpy"`
+	ID   uint32 `json:"title_id,omitempty"`
 }
 
 // CorporationHistory is a history record for a corp the character belonged to
@@ -74,8 +74,8 @@ type CorporationHistory struct {
 }
 
 // IsCharacterOnline gets if the character is currently online
-func (esi Client) IsCharacterOnline(characterID uint32) (*OnlineStatus, error) {
-	body, error := esi.get(fmt.Sprintf("/v2/characters/%d/online/", characterID))
+func (esi Client) IsCharacterOnline(characterID uint32, token string) (*OnlineStatus, error) {
+	body, error := esi.authGet(fmt.Sprintf("/v2/characters/%d/online/", characterID), token)
 	if error != nil {
 		return nil, error
 	}
@@ -90,8 +90,8 @@ func (esi Client) IsCharacterOnline(characterID uint32) (*OnlineStatus, error) {
 }
 
 // GetCharacterLocation get the character's current location
-func (esi Client) GetCharacterLocation(characterID uint32) (*Location, error) {
-	body, error := esi.get(fmt.Sprintf("/v1/characters/%d/location/", characterID))
+func (esi Client) GetCharacterLocation(characterID uint32, token string) (*Location, error) {
+	body, error := esi.authGet(fmt.Sprintf("/v1/characters/%d/location/", characterID), token)
 	if error != nil {
 		return nil, error
 	}
@@ -106,8 +106,8 @@ func (esi Client) GetCharacterLocation(characterID uint32) (*Location, error) {
 }
 
 // GetCharacterShip get the character's current ship
-func (esi Client) GetCharacterShip(characterID uint32) (*Ship, error) {
-	body, error := esi.get(fmt.Sprintf("/v1/characters/%d/ship/", characterID))
+func (esi Client) GetCharacterShip(characterID uint32, token string) (*Ship, error) {
+	body, error := esi.authGet(fmt.Sprintf("/v1/characters/%d/ship/", characterID), token)
 	if error != nil {
 		return nil, error
 	}

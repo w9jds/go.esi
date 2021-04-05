@@ -76,7 +76,7 @@ func (esi Client) GetKillMail(killID uint32, hash string, withFitting bool) (*Ki
 		return nil, nil, err
 	}
 
-	if withFitting == true {
+	if withFitting {
 		return &killmail, buildShipFitting(killmail), nil
 	}
 
