@@ -11,7 +11,7 @@ type ESIStatus struct {
 
 // GetServerStatus get the status of the ESI cluster
 func (esi Client) GetServerStatus() (*ESIStatus, error) {
-	body, err := esi.get("/v2/status")
+	body, _, err := esi.get("/v2/status")
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -14,6 +15,20 @@ import (
 type Client struct {
 	baseURI string
 	client  *http.Client
+}
+
+type Page struct {
+	Current int32
+	Total   int32
+}
+
+func getPage(current int32, headers http.Header) *Page {
+	total, _ := strconv.Atoi(headers.Get("X-Pages"))
+
+	return &Page{
+		Current: current,
+		Total:   int32(total),
+	}
 }
 
 const baseURI = "https://esi.evetech.net"
@@ -36,35 +51,34 @@ func authHeader(request *http.Request, token string) *http.Request {
 	return request
 }
 
-func (esi Client) get(path string) ([]byte, error) {
+func (esi Client) get(path string) ([]byte, http.Header, error) {
 	request, error := http.NewRequest("GET", baseURI+path, nil)
 	if error != nil {
-		return nil, error
+		return nil, nil, error
 	}
 	return esi.do(attachHeaders(request))
 }
 
-func (esi Client) authGet(path string, token string) ([]byte, error) {
+func (esi Client) authGet(path string, token string) ([]byte, http.Header, error) {
 	request, err := http.NewRequest("GET", baseURI+path, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	request = authHeader(request, token)
 	return esi.do(attachHeaders(request))
 }
 
-func (esi Client) post(path string, content []byte) ([]byte, error) {
+func (esi Client) post(path string, content []byte) ([]byte, http.Header, error) {
 	request, error := http.NewRequest("POST", baseURI+path, bytes.NewBuffer(content))
 	if error != nil {
-		return nil, error
+		return nil, nil, error
 	}
 
 	return esi.do(attachHeaders(request))
 }
 
-func (esi Client) do(request *http.Request) ([]byte, error) {
-
+func (esi Client) do(request *http.Request) ([]byte, http.Header, error) {
 	for i := 0; i < 3; i++ {
 		delay := 5 * time.Second
 		response, error := esi.client.Do(request)
@@ -97,9 +111,10 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 				continue
 			}
 		} else {
-			return ioutil.ReadAll(response.Body)
+			message, error := ioutil.ReadAll(response.Body)
+			return message, response.Header, error
 		}
 	}
 
-	return nil, errors.New("failed esi requests 3 times, gave up")
+	return nil, nil, errors.New("failed esi requests 3 times, gave up")
 }

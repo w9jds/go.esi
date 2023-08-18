@@ -44,23 +44,23 @@ type NameRef struct {
 }
 
 // GetTypeIds get a list of all type ids in the game
-func (esi Client) GetTypeIds() ([]uint32, error) {
-	body, err := esi.get("/v1/universe/types/")
+func (esi Client) GetTypeIds(page int32) ([]uint32, *Page, error) {
+	body, headers, err := esi.get(fmt.Sprintf("/v1/universe/types?page=%d", page))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var typeIds []uint32
 	if err := json.Unmarshal(body, &typeIds); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return typeIds, nil
+	return typeIds, getPage(page, headers), nil
 }
 
 // GetType gets the types information from esi
 func (esi Client) GetType(id uint32) (*UniverseType, error) {
-	body, err := esi.get(fmt.Sprintf("/v3/universe/types/%d/", id))
+	body, _, err := esi.get(fmt.Sprintf("/v3/universe/types/%d/", id))
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (esi Client) GetNames(ids []uint) (map[uint]NameRef, error) {
 		return nil, err
 	}
 
-	body, err := esi.post("/v3/universe/names/", buffer)
+	body, _, err := esi.post("/v3/universe/names/", buffer)
 	if err != nil {
 		return nil, err
 	}
