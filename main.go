@@ -2,11 +2,11 @@ package esi
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -55,51 +55,84 @@ func (esi Client) authGet(path string, token string) ([]byte, error) {
 }
 
 func (esi Client) post(path string, content []byte) ([]byte, error) {
-	request, error := http.NewRequest("POST", baseURI+path, bytes.NewBuffer(content))
-	if error != nil {
-		return nil, error
+	request, err := http.NewRequest("POST", baseURI+path, bytes.NewBuffer(content))
+	if err != nil {
+		return nil, err
 	}
 
 	return esi.do(attachHeaders(request))
 }
 
 func (esi Client) do(request *http.Request) ([]byte, error) {
+	var content []byte
+	var err error
 
 	for i := 0; i < 3; i++ {
 		delay := 5 * time.Second
-		response, error := esi.client.Do(request)
 
+		response, error := esi.client.Do(request)
 		if error != nil {
-			log.Println(error)
+			log.Printf("%v\n", error)
 			continue
 		} else if response.StatusCode < 200 || response.StatusCode > 299 {
-
-			// Don't bother retrying three times when you don't have permissions to make the request in the first place
-			if response.StatusCode == 403 || response.StatusCode == 401 {
-				log.Printf("Status %d: Unauthorized\n", response.StatusCode)
-				break
-			}
-
-			message, error := ioutil.ReadAll(response.Body)
+			content, err = io.ReadAll(response.Body)
 
 			if response.StatusCode == 420 {
 				// on error limited wait 60 seconds before proceeding
+				log.Printf("I've been rate limited, waiting 60 seconds before trying again\n")
 				delay = 1 * time.Minute
 			}
 
-			if error != nil {
-				log.Println(error)
+			// Don't bother retrying three times when you don't have permissions to make the request in the first place
+			if response.StatusCode == 403 || response.StatusCode == 401 {
+				return nil, fmt.Errorf("%v", map[string]interface{}{
+					"error":   fmt.Sprintf("Status %d: Unauthorized", response.StatusCode),
+					"url":     request.URL,
+					"status":  response.StatusCode,
+					"content": string(content),
+					"caught":  err,
+				})
+			}
+
+			if response.StatusCode == 400 {
+				return nil, fmt.Errorf("%v", map[string]interface{}{
+					"error":   "Bad Request",
+					"url":     request.URL,
+					"status":  response.StatusCode,
+					"content": string(content),
+					"caught":  err,
+				})
+			}
+
+			if response.StatusCode == 404 || strings.Contains(string(content), "404") {
+				return nil, fmt.Errorf("%v", map[string]interface{}{
+					"error":   "Status 404: Not Found",
+					"url":     request.URL,
+					"status":  response.StatusCode,
+					"content": string(content),
+					"caught":  err,
+				})
+			}
+
+			if err != nil {
+				log.Printf("%v\n", err)
 				time.Sleep(delay)
 				continue
 			} else {
-				log.Println(string(message))
 				time.Sleep(delay)
 				continue
 			}
 		} else {
-			return ioutil.ReadAll(response.Body)
+			return io.ReadAll(response.Body)
 		}
 	}
 
-	return nil, errors.New("failed esi requests 3 times, gave up")
+	var errorPayload = map[string]interface{}{
+		"error":   "Failed to make request after 3 attempts",
+		"url":     request.URL,
+		"content": string(content),
+		"caught":  err,
+	}
+
+	return nil, fmt.Errorf("%v", errorPayload)
 }
