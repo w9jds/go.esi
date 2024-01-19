@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -14,6 +15,20 @@ import (
 type Client struct {
 	baseURI string
 	client  *http.Client
+}
+
+type Page struct {
+	Current int32
+	Total   int32
+}
+
+func getPage(current int32, headers http.Header) *Page {
+	total, _ := strconv.Atoi(headers.Get("X-Pages"))
+
+	return &Page{
+		Current: current,
+		Total:   int32(total),
+	}
 }
 
 const baseURI = "https://esi.evetech.net"
@@ -36,34 +51,34 @@ func authHeader(request *http.Request, token string) *http.Request {
 	return request
 }
 
-func (esi Client) get(path string) ([]byte, error) {
+func (esi Client) get(path string) ([]byte, http.Header, error) {
 	request, error := http.NewRequest("GET", baseURI+path, nil)
 	if error != nil {
-		return nil, error
+		return nil, nil, error
 	}
 	return esi.do(attachHeaders(request))
 }
 
-func (esi Client) authGet(path string, token string) ([]byte, error) {
+func (esi Client) authGet(path string, token string) ([]byte, http.Header, error) {
 	request, err := http.NewRequest("GET", baseURI+path, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	request = authHeader(request, token)
 	return esi.do(attachHeaders(request))
 }
 
-func (esi Client) post(path string, content []byte) ([]byte, error) {
-	request, err := http.NewRequest("POST", baseURI+path, bytes.NewBuffer(content))
-	if err != nil {
-		return nil, err
+func (esi Client) post(path string, content []byte) ([]byte, http.Header, error) {
+	request, error := http.NewRequest("POST", baseURI+path, bytes.NewBuffer(content))
+	if error != nil {
+		return nil, nil, error
 	}
 
 	return esi.do(attachHeaders(request))
 }
 
-func (esi Client) do(request *http.Request) ([]byte, error) {
+func (esi Client) do(request *http.Request) ([]byte, http.Header, error) {
 	var content []byte
 	var err error
 
@@ -85,7 +100,7 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 
 			// Don't bother retrying three times when you don't have permissions to make the request in the first place
 			if response.StatusCode == 403 || response.StatusCode == 401 {
-				return nil, fmt.Errorf("%v", map[string]interface{}{
+				return nil, nil, fmt.Errorf("%v", map[string]interface{}{
 					"error":   fmt.Sprintf("Status %d: Unauthorized", response.StatusCode),
 					"url":     request.URL,
 					"status":  response.StatusCode,
@@ -95,7 +110,7 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 			}
 
 			if response.StatusCode == 400 {
-				return nil, fmt.Errorf("%v", map[string]interface{}{
+				return nil, nil, fmt.Errorf("%v", map[string]interface{}{
 					"error":   "Bad Request",
 					"url":     request.URL,
 					"status":  response.StatusCode,
@@ -105,7 +120,7 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 			}
 
 			if response.StatusCode == 404 || strings.Contains(string(content), "404") {
-				return nil, fmt.Errorf("%v", map[string]interface{}{
+				return nil, nil, fmt.Errorf("%v", map[string]interface{}{
 					"error":   "Status 404: Not Found",
 					"url":     request.URL,
 					"status":  response.StatusCode,
@@ -123,7 +138,8 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 				continue
 			}
 		} else {
-			return io.ReadAll(response.Body)
+			message, error := io.ReadAll(response.Body)
+			return message, response.Header, error
 		}
 	}
 
@@ -134,5 +150,5 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 		"caught":  err,
 	}
 
-	return nil, fmt.Errorf("%v", errorPayload)
+	return nil, nil, fmt.Errorf("%v", errorPayload)
 }

@@ -29,7 +29,7 @@ type Coverage struct {
 
 // GetShipInsurance gets all insurance values and filters out anything that isn't for the specified ShipID
 func (esi Client) GetShipInsurance(shipID uint32) (*Coverage, error) {
-	body, error := esi.get("/v1/insurance/prices/")
+	body, _, error := esi.get("/v1/insurance/prices/")
 	if error != nil {
 		return nil, error
 	}

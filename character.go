@@ -74,7 +74,7 @@ type CorporationHistory struct {
 
 // IsCharacterOnline gets if the character is currently online
 func (esi Client) IsCharacterOnline(characterID uint32, token string) (*OnlineStatus, error) {
-	body, error := esi.authGet(fmt.Sprintf("/v3/characters/%d/online/", characterID), token)
+	body, _, error := esi.authGet(fmt.Sprintf("/v3/characters/%d/online/", characterID), token)
 	if error != nil {
 		return nil, error
 	}
@@ -90,7 +90,7 @@ func (esi Client) IsCharacterOnline(characterID uint32, token string) (*OnlineSt
 
 // GetCharacterLocation get the character's current location
 func (esi Client) GetCharacterLocation(characterID uint32, token string) (*Location, error) {
-	body, error := esi.authGet(fmt.Sprintf("/v2/characters/%d/location/", characterID), token)
+	body, _, error := esi.authGet(fmt.Sprintf("/v2/characters/%d/location/", characterID), token)
 	if error != nil {
 		return nil, error
 	}
@@ -106,7 +106,7 @@ func (esi Client) GetCharacterLocation(characterID uint32, token string) (*Locat
 
 // GetCharacterShip get the character's current ship
 func (esi Client) GetCharacterShip(characterID uint32, token string) (*Ship, error) {
-	body, error := esi.authGet(fmt.Sprintf("/v2/characters/%d/ship/", characterID), token)
+	body, _, error := esi.authGet(fmt.Sprintf("/v2/characters/%d/ship/", characterID), token)
 	if error != nil {
 		return nil, error
 	}
@@ -122,7 +122,7 @@ func (esi Client) GetCharacterShip(characterID uint32, token string) (*Ship, err
 
 // GetCharacterRoles gets the current for this character
 func (esi Client) GetCharacterRoles(characterID uint32, token string) (*Roles, error) {
-	body, error := esi.authGet(fmt.Sprintf("/v3/characters/%d/roles/", characterID), token)
+	body, _, error := esi.authGet(fmt.Sprintf("/v3/characters/%d/roles/", characterID), token)
 	if error != nil {
 		return nil, error
 	}
@@ -138,7 +138,7 @@ func (esi Client) GetCharacterRoles(characterID uint32, token string) (*Roles, e
 
 // GetCharacterTitles returns a list of a characters awarded titles
 func (esi Client) GetCharacterTitles(characterID uint32, token string) ([]Title, error) {
-	body, error := esi.authGet(fmt.Sprintf("/v2/characters/%d/titles/", characterID), token)
+	body, _, error := esi.authGet(fmt.Sprintf("/v2/characters/%d/titles/", characterID), token)
 	if error != nil {
 		return nil, error
 	}
@@ -153,7 +153,7 @@ func (esi Client) GetCharacterTitles(characterID uint32, token string) ([]Title,
 
 // GetCharacterDetails retrieves the characters basic information from the characterID
 func (esi Client) GetCharacterDetails(characterID uint32) (*CharacterDetails, error) {
-	body, err := esi.get(fmt.Sprintf("/v5/characters/%d/", characterID))
+	body, _, err := esi.get(fmt.Sprintf("/v5/characters/%d/", characterID))
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +173,7 @@ func (esi Client) GetCharacterAffiliations(ids []uint32) ([]Affiliation, error) 
 		return nil, error
 	}
 
-	body, error := esi.post("/v2/characters/affiliation/", buffer)
+	body, _, error := esi.post("/v2/characters/affiliation/", buffer)
 	if error != nil {
 		return nil, error
 	}

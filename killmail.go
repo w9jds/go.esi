@@ -66,7 +66,7 @@ type KillFitting struct {
 
 // GetKillMail retrieves a specific killmail from ESI
 func (esi Client) GetKillMail(killID uint32, hash string, withFitting bool) (*KillMail, *KillFitting, error) {
-	body, err := esi.get(fmt.Sprintf("/v1/killmails/%d/%s/", killID, hash))
+	body, _, err := esi.get(fmt.Sprintf("/v1/killmails/%d/%s/", killID, hash))
 	if err != nil {
 		return nil, nil, err
 	}
