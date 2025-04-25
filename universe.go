@@ -36,6 +36,37 @@ type UniverseType struct {
 	Volume          float32           `json:"volume,omitempty"`
 }
 
+type Planet struct {
+	AstroidBelts []uint32 `json:"asteroid_belts,omitempty"`
+	Moons        []uint32 `json:"moons,omitempty"`
+	PlanetID     uint32   `json:"planet_id,omitempty"`
+}
+
+type SolarSystem struct {
+	ID              uint32   `json:"system_id,omitempty"`
+	ConstellationID uint32   `json:"constellation_id,omitempty"`
+	Name            string   `json:"name,omitempty"`
+	Planets         []Planet `json:"planets,omitempty"`
+	Position        Position `json:"position,omitempty"`
+	SecurityClass   string   `json:"security_class,omitempty"`
+	SecurityStatus  float32  `json:"security_status,omitempty"`
+	StarID          uint32   `json:"star_id,omitempty"`
+	Stargates       []uint32 `json:"stargates,omitempty"`
+	Stations        []uint32 `json:"stations,omitempty"`
+}
+
+type Stargate struct {
+	ID          uint32   `json:"stargate_id,omitempty"`
+	SystemID    uint32   `json:"system_id,omitempty"`
+	Position    Position `json:"position,omitempty"`
+	Name        string   `json:"name,omitempty"`
+	TypeID      uint32   `json:"type_id,omitempty"`
+	Destination struct {
+		StargateID uint32 `json:"stargate_id,omitempty"`
+		SystemID   uint32 `json:"system_id,omitempty"`
+	} `json:"destination,omitempty"`
+}
+
 // NameRef is a reference to a name that is returned from esi
 type NameRef struct {
 	Category string `json:"category"`
@@ -71,6 +102,48 @@ func (esi Client) GetType(id uint32) (*UniverseType, error) {
 	}
 
 	return &item, nil
+}
+
+func (esi Client) GetSystems() ([]uint32, error) {
+	body, err := esi.get("/latest/universe/systems/")
+	if err != nil {
+		return nil, err
+	}
+
+	var systems []uint32
+	if err := json.Unmarshal(body, &systems); err != nil {
+		return nil, err
+	}
+
+	return systems, nil
+}
+
+func (esi Client) GetSystem(systemID uint32) (*SolarSystem, error) {
+	body, err := esi.get(fmt.Sprintf("/latest/universe/systems/%d/", systemID))
+	if err != nil {
+		return nil, err
+	}
+
+	var system SolarSystem
+	if err := json.Unmarshal(body, &system); err != nil {
+		return nil, err
+	}
+
+	return &system, nil
+}
+
+func (esi Client) GetStargate(stargateId uint32) (*Stargate, error) {
+	body, err := esi.get(fmt.Sprintf("/latest/universe/stargates/%d/", stargateId))
+	if err != nil {
+		return nil, err
+	}
+
+	var gate Stargate
+	if err := json.Unmarshal(body, &gate); err != nil {
+		return nil, err
+	}
+
+	return &gate, nil
 }
 
 // GetNames get a list of names from a list of ids

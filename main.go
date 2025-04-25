@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -67,8 +67,8 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 
 	for i := 0; i < 3; i++ {
 		delay := 5 * time.Second
-		response, error := esi.client.Do(request)
 
+		response, error := esi.client.Do(request)
 		if error != nil {
 			log.Println(error)
 			continue
@@ -80,7 +80,7 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 				break
 			}
 
-			message, error := ioutil.ReadAll(response.Body)
+			message, error := io.ReadAll(response.Body)
 
 			if response.StatusCode == 420 {
 				// on error limited wait 60 seconds before proceeding
@@ -97,7 +97,7 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 				continue
 			}
 		} else {
-			return ioutil.ReadAll(response.Body)
+			return io.ReadAll(response.Body)
 		}
 	}
 
