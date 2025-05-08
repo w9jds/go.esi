@@ -73,79 +73,55 @@ type CorporationHistory struct {
 }
 
 // IsCharacterOnline gets if the character is currently online
-func (esi Client) IsCharacterOnline(characterID uint32, token string) (*OnlineStatus, error) {
-	body, error := esi.authGet(fmt.Sprintf("/v3/characters/%d/online/", characterID), token)
-	if error != nil {
-		return nil, error
-	}
-
+func (esi Client) IsCharacterOnline(characterID uint32, token string) (OnlineStatus, error) {
 	var status OnlineStatus
-	error = json.Unmarshal(body, &status)
-	if error != nil {
-		return nil, error
+	err := esi.authGet(fmt.Sprintf("/v3/characters/%d/online/", characterID), token, &status)
+	if err != nil {
+		return OnlineStatus{}, err
 	}
 
-	return &status, nil
+	return status, nil
 }
 
 // GetCharacterLocation get the character's current location
-func (esi Client) GetCharacterLocation(characterID uint32, token string) (*Location, error) {
-	body, error := esi.authGet(fmt.Sprintf("/v2/characters/%d/location/", characterID), token)
-	if error != nil {
-		return nil, error
-	}
-
+func (esi Client) GetCharacterLocation(characterID uint32, token string) (Location, error) {
 	var location Location
-	error = json.Unmarshal(body, &location)
-	if error != nil {
-		return nil, error
+	err := esi.authGet(fmt.Sprintf("/v2/characters/%d/location/", characterID), token, &location)
+	if err != nil {
+		return Location{}, err
 	}
 
-	return &location, nil
+	return location, nil
 }
 
 // GetCharacterShip get the character's current ship
-func (esi Client) GetCharacterShip(characterID uint32, token string) (*Ship, error) {
-	body, error := esi.authGet(fmt.Sprintf("/v2/characters/%d/ship/", characterID), token)
-	if error != nil {
-		return nil, error
-	}
-
+func (esi Client) GetCharacterShip(characterID uint32, token string) (Ship, error) {
 	var ship Ship
-	error = json.Unmarshal(body, &ship)
-	if error != nil {
-		return nil, error
+	err := esi.authGet(fmt.Sprintf("/v2/characters/%d/ship/", characterID), token, &ship)
+	if err != nil {
+		return Ship{}, err
 	}
 
-	return &ship, nil
+	return ship, nil
 }
 
 // GetCharacterRoles gets the current for this character
-func (esi Client) GetCharacterRoles(characterID uint32, token string) (*Roles, error) {
-	body, error := esi.authGet(fmt.Sprintf("/v3/characters/%d/roles/", characterID), token)
-	if error != nil {
-		return nil, error
-	}
-
+func (esi Client) GetCharacterRoles(characterID uint32, token string) (Roles, error) {
 	var roles Roles
-	error = json.Unmarshal(body, &roles)
-	if error != nil {
-		return nil, error
+	err := esi.authGet(fmt.Sprintf("/v3/characters/%d/roles/", characterID), token, &roles)
+	if err != nil {
+		return Roles{}, err
 	}
 
-	return &roles, nil
+	return roles, nil
 }
 
 // GetCharacterTitles returns a list of a characters awarded titles
 func (esi Client) GetCharacterTitles(characterID uint32, token string) ([]Title, error) {
-	body, error := esi.authGet(fmt.Sprintf("/v2/characters/%d/titles/", characterID), token)
+	var titles []Title
+	error := esi.authGet(fmt.Sprintf("/v2/characters/%d/titles/", characterID), token, &titles)
 	if error != nil {
 		return nil, error
-	}
-
-	var titles []Title
-	if err := json.Unmarshal(body, &titles); err != nil {
-		return nil, err
 	}
 
 	return titles, nil
@@ -153,13 +129,9 @@ func (esi Client) GetCharacterTitles(characterID uint32, token string) ([]Title,
 
 // GetCharacterDetails retrieves the characters basic information from the characterID
 func (esi Client) GetCharacterDetails(characterID uint32) (*CharacterDetails, error) {
-	body, err := esi.get(fmt.Sprintf("/v5/characters/%d/", characterID))
-	if err != nil {
-		return nil, err
-	}
-
 	var details CharacterDetails
-	if err := json.Unmarshal(body, &details); err != nil {
+	err := esi.get(fmt.Sprintf("/v5/characters/%d/", characterID), &details)
+	if err != nil {
 		return nil, err
 	}
 
@@ -168,18 +140,14 @@ func (esi Client) GetCharacterDetails(characterID uint32) (*CharacterDetails, er
 
 // GetCharacterAffiliations get the affiliations of all passed of characterIds
 func (esi Client) GetCharacterAffiliations(ids []uint32) ([]Affiliation, error) {
-	buffer, error := json.Marshal(ids)
-	if error != nil {
-		return nil, error
-	}
-
-	body, error := esi.post("/v2/characters/affiliation/", buffer)
-	if error != nil {
-		return nil, error
+	buffer, err := json.Marshal(ids)
+	if err != nil {
+		return nil, err
 	}
 
 	var affiliations []Affiliation
-	if err := json.Unmarshal(body, &affiliations); err != nil {
+	err = esi.post("/v2/characters/affiliation/", buffer, &affiliations)
+	if err != nil {
 		return nil, err
 	}
 

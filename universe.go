@@ -67,6 +67,47 @@ type Stargate struct {
 	} `json:"destination,omitempty"`
 }
 
+type Constellation struct {
+	ID       uint32   `json:"constellation_id,omitempty"`
+	Name     string   `json:"name,omitempty"`
+	Position Position `json:"position,omitempty"`
+	RegionID uint32   `json:"region_id,omitempty"`
+	Systems  []uint32 `json:"systems,omitempty"`
+}
+
+type Region struct {
+	ID             uint32   `json:"region_id,omitempty"`
+	Name           string   `json:"name,omitempty"`
+	Description    string   `json:"description,omitempty"`
+	Constellations []uint32 `json:"constellations,omitempty"`
+}
+
+type Station struct {
+	ID                       uint32   `json:"station_id,omitempty"`
+	MaxDockableShipVolume    float32  `json:"max_dockable_ship_volume,omitempty"`
+	Name                     string   `json:"name,omitempty"`
+	OfficeRentalCost         float32  `json:"office_rental_cost,omitempty"`
+	Owner                    uint32   `json:"owner,omitempty"`
+	Position                 Position `json:"position,omitempty"`
+	RaceID                   uint32   `json:"race_id,omitempty"`
+	ReprocessingEfficiency   float32  `json:"reprocessing_efficiency,omitempty"`
+	ReprocessingStationsTake float32  `json:"reprocessing_stations_take,omitempty"`
+	Services                 []string `json:"services,omitempty"`
+	SystemID                 uint32   `json:"system_id,omitempty"`
+	TypeID                   uint32   `json:"type_id,omitempty"`
+}
+
+type Star struct {
+	Age           uint64  `json:"age,omitempty"`
+	Luminosity    float32 `json:"luminosity,omitempty"`
+	Name          string  `json:"name,omitempty"`
+	Radius        uint64  `json:"radius,omitempty"`
+	SystemID      uint32  `json:"solar_system_id,omitempty"`
+	SpectralClass string  `json:"spectral_class,omitempty"`
+	Temperature   uint32  `json:"temperature,omitempty"`
+	TypeID        uint32  `json:"type_id,omitempty"`
+}
+
 // NameRef is a reference to a name that is returned from esi
 type NameRef struct {
 	Category string `json:"category"`
@@ -76,90 +117,101 @@ type NameRef struct {
 
 // GetTypeIds get a list of all type ids in the game
 func (esi Client) GetTypeIds() ([]uint32, error) {
-	body, err := esi.get("/v1/universe/types/")
-	if err != nil {
-		return nil, err
-	}
-
-	var typeIds []uint32
-	if err := json.Unmarshal(body, &typeIds); err != nil {
-		return nil, err
-	}
-
-	return typeIds, nil
+	return esi.getIds("/v1/universe/types/")
 }
 
 // GetType gets the types information from esi
-func (esi Client) GetType(id uint32) (*UniverseType, error) {
-	body, err := esi.get(fmt.Sprintf("/v3/universe/types/%d/", id))
-	if err != nil {
-		return nil, err
-	}
-
+func (esi Client) GetType(id uint32) (UniverseType, error) {
 	var item UniverseType
-	if err := json.Unmarshal(body, &item); err != nil {
-		return nil, err
+	err := esi.get(fmt.Sprintf("/v3/universe/types/%d/", id), &item)
+	if err != nil {
+		return UniverseType{}, err
 	}
 
-	return &item, nil
+	return item, nil
 }
 
 func (esi Client) GetSystems() ([]uint32, error) {
-	body, err := esi.get("/latest/universe/systems/")
-	if err != nil {
-		return nil, err
-	}
-
-	var systems []uint32
-	if err := json.Unmarshal(body, &systems); err != nil {
-		return nil, err
-	}
-
-	return systems, nil
+	return esi.getIds("/latest/universe/systems/")
 }
 
-func (esi Client) GetSystem(systemID uint32) (*SolarSystem, error) {
-	body, err := esi.get(fmt.Sprintf("/latest/universe/systems/%d/", systemID))
-	if err != nil {
-		return nil, err
-	}
+func (esi Client) GetConstellations() ([]uint32, error) {
+	return esi.getIds("/latest/universe/constellations/")
+}
 
+func (esi Client) GetRegions() ([]uint32, error) {
+	return esi.getIds("/latest/universe/regions/")
+}
+
+func (esi Client) GetSystem(id uint32) (SolarSystem, error) {
 	var system SolarSystem
-	if err := json.Unmarshal(body, &system); err != nil {
-		return nil, err
-	}
-
-	return &system, nil
-}
-
-func (esi Client) GetStargate(stargateId uint32) (*Stargate, error) {
-	body, err := esi.get(fmt.Sprintf("/latest/universe/stargates/%d/", stargateId))
+	err := esi.get(fmt.Sprintf("/latest/universe/systems/%d/", id), &system)
 	if err != nil {
-		return nil, err
+		return SolarSystem{}, err
 	}
 
-	var gate Stargate
-	if err := json.Unmarshal(body, &gate); err != nil {
-		return nil, err
-	}
-
-	return &gate, nil
+	return system, nil
 }
 
-// GetNames get a list of names from a list of ids
+func (esi Client) GetConstellation(id uint32) (Constellation, error) {
+	var constellation Constellation
+	err := esi.get(fmt.Sprintf("/latest/universe/constellations/%d/", id), &constellation)
+	if err != nil {
+		return Constellation{}, err
+	}
+
+	return constellation, nil
+}
+
+func (esi Client) GetRegion(id uint32) (Region, error) {
+	var region Region
+	err := esi.get(fmt.Sprintf("/latest/universe/regions/%d/", id), &region)
+	if err != nil {
+		return Region{}, err
+	}
+
+	return region, nil
+}
+
+func (esi Client) GetStargate(id uint32) (Stargate, error) {
+	var gate Stargate
+	err := esi.get(fmt.Sprintf("/latest/universe/stargates/%d/", id), &gate)
+	if err != nil {
+		return Stargate{}, err
+	}
+
+	return gate, nil
+}
+
+func (esi Client) GetStation(id uint32) (Station, error) {
+	var station Station
+	err := esi.get(fmt.Sprintf("/latest/universe/stations/%d/", id), &station)
+	if err != nil {
+		return Station{}, err
+	}
+
+	return station, nil
+}
+
+func (esi Client) GetStar(id uint32) (Star, error) {
+	var star Star
+	err := esi.get(fmt.Sprintf("/latest/universe/stars/%d/", id), &star)
+	if err != nil {
+		return Star{}, err
+	}
+
+	return star, nil
+}
+
 func (esi Client) GetNames(ids []uint) (map[uint]NameRef, error) {
 	buffer, err := json.Marshal(ids)
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := esi.post("/v3/universe/names/", buffer)
-	if err != nil {
-		return nil, err
-	}
-
 	var names []NameRef
-	if err := json.Unmarshal(body, &names); err != nil {
+	err = esi.post("/v3/universe/names/", buffer, &names)
+	if err != nil {
 		return nil, err
 	}
 

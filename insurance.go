@@ -1,7 +1,6 @@
 package esi
 
 import (
-	"encoding/json"
 	"errors"
 	"reflect"
 )
@@ -29,14 +28,10 @@ type Coverage struct {
 
 // GetShipInsurance gets all insurance values and filters out anything that isn't for the specified ShipID
 func (esi Client) GetShipInsurance(shipID uint32) (*Coverage, error) {
-	body, error := esi.get("/v1/insurance/prices/")
+	var ships []insurance
+	error := esi.get("/v1/insurance/prices/", &ships)
 	if error != nil {
 		return nil, error
-	}
-
-	var ships []insurance
-	if err := json.Unmarshal(body, &ships); err != nil {
-		return nil, err
 	}
 
 	for _, insurance := range ships {

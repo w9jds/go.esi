@@ -1,3 +1,3 @@
 module github.com/w9jds/go.esi
 
-go 1.17
+go 1.23

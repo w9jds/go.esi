@@ -2,6 +2,7 @@ package esi
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -36,35 +37,62 @@ func authHeader(request *http.Request, token string) *http.Request {
 	return request
 }
 
-func (esi Client) get(path string) ([]byte, error) {
-	request, error := http.NewRequest("GET", baseURI+path, nil)
-	if error != nil {
-		return nil, error
-	}
-	return esi.do(attachHeaders(request))
-}
-
-func (esi Client) authGet(path string, token string) ([]byte, error) {
+func (esi Client) get(path string, result interface{}) error {
 	request, err := http.NewRequest("GET", baseURI+path, nil)
 	if err != nil {
-		return nil, err
+		return err
+	}
+
+	data, err := esi.do(attachHeaders(request))
+	if err != nil {
+		return err
+	}
+
+	if err := json.Unmarshal(data, result); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (esi Client) authGet(path string, token string, result interface{}) error {
+	request, err := http.NewRequest("GET", baseURI+path, nil)
+	if err != nil {
+		return err
 	}
 
 	request = authHeader(request, token)
-	return esi.do(attachHeaders(request))
-}
-
-func (esi Client) post(path string, content []byte) ([]byte, error) {
-	request, error := http.NewRequest("POST", baseURI+path, bytes.NewBuffer(content))
-	if error != nil {
-		return nil, error
+	data, err := esi.do(attachHeaders(request))
+	if err != nil {
+		return err
 	}
 
-	return esi.do(attachHeaders(request))
+	if err := json.Unmarshal(data, result); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (esi Client) post(path string, content []byte, result interface{}) error {
+	request, err := http.NewRequest("POST", baseURI+path, bytes.NewBuffer(content))
+	if err != nil {
+		return err
+	}
+
+	data, err := esi.do(attachHeaders(request))
+	if err != nil {
+		return err
+	}
+
+	if err := json.Unmarshal(data, result); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (esi Client) do(request *http.Request) ([]byte, error) {
-
 	for i := 0; i < 3; i++ {
 		delay := 5 * time.Second
 
@@ -102,4 +130,14 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 	}
 
 	return nil, errors.New("failed esi requests 3 times, gave up")
+}
+
+func (esi Client) getIds(path string) ([]uint32, error) {
+	var ids []uint32
+	err := esi.get(path, &ids)
+	if err != nil {
+		return nil, err
+	}
+
+	return ids, nil
 }

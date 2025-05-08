@@ -1,7 +1,6 @@
 package esi
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -26,9 +25,9 @@ type victim struct {
 }
 
 type Position struct {
-	X float32 `json:"x,omitempty"`
-	Y float32 `json:"y,omitempty"`
-	Z float32 `json:"z,omitempty"`
+	X float64 `json:"x,omitempty"`
+	Y float64 `json:"y,omitempty"`
+	Z float64 `json:"z,omitempty"`
 }
 
 type attacker struct {
@@ -66,13 +65,9 @@ type KillFitting struct {
 
 // GetKillMail retrieves a specific killmail from ESI
 func (esi Client) GetKillMail(killID uint32, hash string, withFitting bool) (*KillMail, *KillFitting, error) {
-	body, err := esi.get(fmt.Sprintf("/v1/killmails/%d/%s/", killID, hash))
-	if err != nil {
-		return nil, nil, err
-	}
-
 	var killmail KillMail
-	if err := json.Unmarshal(body, &killmail); err != nil {
+	err := esi.get(fmt.Sprintf("/v1/killmails/%d/%s/", killID, hash), &killmail)
+	if err != nil {
 		return nil, nil, err
 	}
 

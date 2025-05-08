@@ -1,7 +1,6 @@
 package esi
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -16,29 +15,15 @@ type MarketGroup struct {
 
 // GetMarketGroupIds returns a list of all possible market group ids
 func (esi Client) GetMarketGroupIds() ([]uint32, error) {
-	body, error := esi.get("/latest/markets/groups/?datasource=tranquility")
-	if error != nil {
-		return nil, error
-	}
-
-	var groupIds []uint32
-	if err := json.Unmarshal(body, &groupIds); err != nil {
-		return nil, err
-	}
-
-	return groupIds, nil
+	return esi.getIds("/latest/markets/groups/")
 }
 
 // GetMarketGroup get the specified market group
 func (esi Client) GetMarketGroup(id uint32) (*MarketGroup, error) {
-	body, error := esi.get(fmt.Sprintf("/v1/markets/groups/%d/", id))
+	var group MarketGroup
+	error := esi.get(fmt.Sprintf("/v1/markets/groups/%d/", id), &group)
 	if error != nil {
 		return nil, error
-	}
-
-	var group MarketGroup
-	if err := json.Unmarshal(body, &group); err != nil {
-		return nil, err
 	}
 
 	return &group, error
