@@ -3,12 +3,12 @@ package esi
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
+
+	"k8s.io/klog"
 )
 
 // Client is a client for communication with the eve online api
@@ -92,44 +92,60 @@ func (esi Client) post(path string, content []byte, result interface{}) error {
 	return nil
 }
 
+type ResponseError struct {
+	Path       string
+	StatusCode int
+	Error      error
+}
+
 func (esi Client) do(request *http.Request) ([]byte, error) {
 	for i := 0; i < 3; i++ {
 		delay := 5 * time.Second
 
 		response, error := esi.client.Do(request)
 		if error != nil {
-			log.Println(error)
+			klog.Error(ResponseError{
+				Path:  request.URL.Path,
+				Error: error,
+			})
+			time.Sleep(delay)
 			continue
 		} else if response.StatusCode < 200 || response.StatusCode > 299 {
+			log := ResponseError{
+				Path:       request.URL.Path,
+				StatusCode: response.StatusCode,
+			}
 
 			// Don't bother retrying three times when you don't have permissions to make the request in the first place
 			if response.StatusCode == 403 || response.StatusCode == 401 {
-				log.Printf("Status %d: Unauthorized\n", response.StatusCode)
+				klog.Error(log)
 				break
 			}
 
 			message, error := io.ReadAll(response.Body)
 
-			if response.StatusCode == 420 {
-				// on error limited wait 60 seconds before proceeding
-				delay = 1 * time.Minute
+			// Don't bother retrying three times when rate limited
+			if response.StatusCode == 420 || response.StatusCode == 404 {
+				log.Error = fmt.Errorf("%s", message)
+				klog.Error(log)
+				break
 			}
 
 			if error != nil {
-				log.Println(error)
-				time.Sleep(delay)
-				continue
+				log.Error = error
 			} else {
-				log.Println(string(message))
-				time.Sleep(delay)
-				continue
+				log.Error = fmt.Errorf("%s", message)
 			}
+
+			klog.Error(log)
+			time.Sleep(delay)
+			continue
 		} else {
 			return io.ReadAll(response.Body)
 		}
 	}
 
-	return nil, errors.New("failed esi requests 3 times, gave up")
+	return nil, fmt.Errorf("Failed Request %s After 3 Tries", request.URL.Path)
 }
 
 func (esi Client) getIds(path string) ([]uint32, error) {

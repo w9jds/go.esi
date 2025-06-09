@@ -72,6 +72,16 @@ type CorporationHistory struct {
 	StartDate string `json:"start_date,omitempty"`
 }
 
+func (esi Client) GetCharacterCorpHistory(characterID uint32) ([]CorporationHistory, error) {
+	var history []CorporationHistory
+	err := esi.get(fmt.Sprintf("/v2/characters/%d/corporationhistory/", characterID), &history)
+	if err != nil {
+		return []CorporationHistory{}, err
+	}
+
+	return history, nil
+}
+
 // IsCharacterOnline gets if the character is currently online
 func (esi Client) IsCharacterOnline(characterID uint32, token string) (OnlineStatus, error) {
 	var status OnlineStatus
