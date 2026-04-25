@@ -7,15 +7,15 @@ import (
 
 // CharacterDetails references information from the character endpoint
 type CharacterDetails struct {
-	AllianceID     uint32  `json:"alliance_id,omitempty"`
+	AllianceID     int64  `json:"alliance_id,omitempty"`
 	Birthday       string  `json:"birthday"`
-	BloodlineID    uint32  `json:"bloodline_id,omitempty"`
-	CorporationID  uint32  `json:"corporation_id"`
+	BloodlineID    int64  `json:"bloodline_id,omitempty"`
+	CorporationID  int64  `json:"corporation_id"`
 	Description    string  `json:"description,omitempty"`
-	FactionID      uint32  `json:"faction_id,omitempty"`
+	FactionID      int64  `json:"faction_id,omitempty"`
 	Gender         string  `json:"gender"`
 	Name           string  `json:"name"`
-	RaceID         uint32  `json:"race_id"`
+	RaceID         int64  `json:"race_id"`
 	SecurityStatus float32 `json:"security_status"`
 	Title          string  `json:"title"`
 }
@@ -44,10 +44,10 @@ type Ship struct {
 
 // Affiliation represents a characters corp affiliations
 type Affiliation struct {
-	AllianceID  uint32 `json:"alliance_id,omitempty"`
-	CharacterID uint32 `json:"character_id,omitempty"`
-	CorpID      uint32 `json:"corporation_id,omitempty"`
-	FactionID   uint32 `json:"faction_id,omitempty"`
+	AllianceID  int64 `json:"alliance_id,omitempty"`
+	CharacterID int64 `json:"character_id,omitempty"`
+	CorpID      int64 `json:"corporation_id,omitempty"`
+	FactionID   int64 `json:"faction_id,omitempty"`
 }
 
 // Roles represents the roles a character currently has
@@ -61,21 +61,21 @@ type Roles struct {
 // Title represents a title
 type Title struct {
 	Name string `json:"name,omitempty"`
-	ID   uint32 `json:"title_id,omitempty"`
+	ID   int64 `json:"title_id,omitempty"`
 }
 
 // CorporationHistory is a history record for a corp the character belonged to
 type CorporationHistory struct {
-	ID        uint32 `json:"corporation_id,omitempty"`
+	ID        int64 `json:"corporation_id,omitempty"`
 	Deleted   bool   `json:"is_deleted,omitempty"`
-	RecordID  uint32 `json:"record_id,omitempty"`
+	RecordID  int64 `json:"record_id,omitempty"`
 	StartDate string `json:"start_date,omitempty"`
 }
 
 // IsCharacterOnline gets if the character is currently online
-func (esi Client) IsCharacterOnline(characterID uint32, token string) (OnlineStatus, error) {
+func (esi Client) IsCharacterOnline(characterID int64, token string) (OnlineStatus, error) {
 	var status OnlineStatus
-	err := esi.authGet(fmt.Sprintf("/v3/characters/%d/online/", characterID), token, &status)
+	err := esi.authGet(fmt.Sprintf("/characters/%d/online/", characterID), token, &status)
 	if err != nil {
 		return OnlineStatus{}, err
 	}
@@ -84,9 +84,9 @@ func (esi Client) IsCharacterOnline(characterID uint32, token string) (OnlineSta
 }
 
 // GetCharacterLocation get the character's current location
-func (esi Client) GetCharacterLocation(characterID uint32, token string) (Location, error) {
+func (esi Client) GetCharacterLocation(characterID int64, token string) (Location, error) {
 	var location Location
-	err := esi.authGet(fmt.Sprintf("/v2/characters/%d/location/", characterID), token, &location)
+	err := esi.authGet(fmt.Sprintf("/characters/%d/location/", characterID), token, &location)
 	if err != nil {
 		return Location{}, err
 	}
@@ -95,9 +95,9 @@ func (esi Client) GetCharacterLocation(characterID uint32, token string) (Locati
 }
 
 // GetCharacterShip get the character's current ship
-func (esi Client) GetCharacterShip(characterID uint32, token string) (Ship, error) {
+func (esi Client) GetCharacterShip(characterID int64, token string) (Ship, error) {
 	var ship Ship
-	err := esi.authGet(fmt.Sprintf("/v2/characters/%d/ship/", characterID), token, &ship)
+	err := esi.authGet(fmt.Sprintf("/characters/%d/ship/", characterID), token, &ship)
 	if err != nil {
 		return Ship{}, err
 	}
@@ -106,9 +106,9 @@ func (esi Client) GetCharacterShip(characterID uint32, token string) (Ship, erro
 }
 
 // GetCharacterRoles gets the current for this character
-func (esi Client) GetCharacterRoles(characterID uint32, token string) (Roles, error) {
+func (esi Client) GetCharacterRoles(characterID int64, token string) (Roles, error) {
 	var roles Roles
-	err := esi.authGet(fmt.Sprintf("/v3/characters/%d/roles/", characterID), token, &roles)
+	err := esi.authGet(fmt.Sprintf("/characters/%d/roles/", characterID), token, &roles)
 	if err != nil {
 		return Roles{}, err
 	}
@@ -117,9 +117,9 @@ func (esi Client) GetCharacterRoles(characterID uint32, token string) (Roles, er
 }
 
 // GetCharacterTitles returns a list of a characters awarded titles
-func (esi Client) GetCharacterTitles(characterID uint32, token string) ([]Title, error) {
+func (esi Client) GetCharacterTitles(characterID int64, token string) ([]Title, error) {
 	var titles []Title
-	error := esi.authGet(fmt.Sprintf("/v2/characters/%d/titles/", characterID), token, &titles)
+	error := esi.authGet(fmt.Sprintf("/characters/%d/titles/", characterID), token, &titles)
 	if error != nil {
 		return nil, error
 	}
@@ -128,9 +128,9 @@ func (esi Client) GetCharacterTitles(characterID uint32, token string) ([]Title,
 }
 
 // GetCharacterDetails retrieves the characters basic information from the characterID
-func (esi Client) GetCharacterDetails(characterID uint32) (*CharacterDetails, error) {
+func (esi Client) GetCharacterDetails(characterID int64) (*CharacterDetails, error) {
 	var details CharacterDetails
-	err := esi.get(fmt.Sprintf("/v5/characters/%d/", characterID), &details)
+	err := esi.get(fmt.Sprintf("/characters/%d/", characterID), &details)
 	if err != nil {
 		return nil, err
 	}
@@ -139,14 +139,14 @@ func (esi Client) GetCharacterDetails(characterID uint32) (*CharacterDetails, er
 }
 
 // GetCharacterAffiliations get the affiliations of all passed of characterIds
-func (esi Client) GetCharacterAffiliations(ids []uint32) ([]Affiliation, error) {
+func (esi Client) GetCharacterAffiliations(ids []int64) ([]Affiliation, error) {
 	buffer, err := json.Marshal(ids)
 	if err != nil {
 		return nil, err
 	}
 
 	var affiliations []Affiliation
-	err = esi.post("/v2/characters/affiliation/", buffer, &affiliations)
+	err = esi.post("/characters/affiliation/", buffer, &affiliations)
 	if err != nil {
 		return nil, err
 	}

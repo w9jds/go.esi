@@ -7,94 +7,94 @@ import (
 )
 
 type dogmaAttributes struct {
-	AttributeID uint32  `json:"attribute_id,omitempty"`
+	AttributeID int64  `json:"attribute_id,omitempty"`
 	Value       float64 `json:"value,omitempty"`
 }
 
 type dogmaEffects struct {
-	EffectID  uint32 `json:"effect_id,omitempty"`
+	EffectID  int64 `json:"effect_id,omitempty"`
 	IsDefault bool   `json:"is_default,omitempty"`
 }
 
 // UniverseType represents an item in eve online
 type UniverseType struct {
-	ID              uint32            `json:"type_id,omitempty"`
+	ID              int64            `json:"type_id,omitempty"`
 	Capacity        float32           `json:"capacity,omitempty"`
 	Description     string            `json:"description,omitempty"`
 	DogmaAttributes []dogmaAttributes `json:"dogma_attributes,omitempty"`
 	DogmaEffects    []dogmaEffects    `json:"dogma_effects,omitempty"`
-	GraphicID       uint32            `json:"graphic_id,omitempty"`
-	GroupID         uint32            `json:"group_id,omitempty"`
-	IconID          uint32            `json:"icon_id,omitempty"`
-	MarketGroupID   uint32            `json:"market_group_id,omitempty"`
+	GraphicID       int64            `json:"graphic_id,omitempty"`
+	GroupID         int64            `json:"group_id,omitempty"`
+	IconID          int64            `json:"icon_id,omitempty"`
+	MarketGroupID   int64            `json:"market_group_id,omitempty"`
 	Mass            float64           `json:"mass,omitempty"`
 	Name            string            `json:"name,omitempty"`
 	PackageVolume   float32           `json:"packaged_volume,omitempty"`
-	PortionSize     uint32            `json:"portion_size,omitempty"`
+	PortionSize     int64            `json:"portion_size,omitempty"`
 	Published       bool              `json:"published,omitempty"`
 	Radius          float32           `json:"radius,omitempty"`
 	Volume          float32           `json:"volume,omitempty"`
 }
 
 type Planet struct {
-	AstroidBelts []uint32 `json:"asteroid_belts,omitempty"`
-	Moons        []uint32 `json:"moons,omitempty"`
-	PlanetID     uint32   `json:"planet_id,omitempty"`
+	AstroidBelts []int64 `json:"asteroid_belts,omitempty"`
+	Moons        []int64 `json:"moons,omitempty"`
+	PlanetID     int64   `json:"planet_id,omitempty"`
 }
 
 type SolarSystem struct {
-	ID              uint32   `json:"system_id,omitempty"`
-	ConstellationID uint32   `json:"constellation_id,omitempty"`
+	ID              int64   `json:"system_id,omitempty"`
+	ConstellationID int64   `json:"constellation_id,omitempty"`
 	Name            string   `json:"name,omitempty"`
 	Planets         []Planet `json:"planets,omitempty"`
 	Position        Position `json:"position,omitempty"`
 	SecurityClass   string   `json:"security_class,omitempty"`
 	SecurityStatus  float32  `json:"security_status,omitempty"`
-	StarID          uint32   `json:"star_id,omitempty"`
-	Stargates       []uint32 `json:"stargates,omitempty"`
-	Stations        []uint32 `json:"stations,omitempty"`
+	StarID          int64   `json:"star_id,omitempty"`
+	Stargates       []int64 `json:"stargates,omitempty"`
+	Stations        []int64 `json:"stations,omitempty"`
 }
 
 type Stargate struct {
-	ID          uint32   `json:"stargate_id,omitempty"`
-	SystemID    uint32   `json:"system_id,omitempty"`
+	ID          int64   `json:"stargate_id,omitempty"`
+	SystemID    int64   `json:"system_id,omitempty"`
 	Position    Position `json:"position,omitempty"`
 	Name        string   `json:"name,omitempty"`
-	TypeID      uint32   `json:"type_id,omitempty"`
+	TypeID      int64   `json:"type_id,omitempty"`
 	Destination struct {
-		StargateID uint32 `json:"stargate_id,omitempty"`
-		SystemID   uint32 `json:"system_id,omitempty"`
+		StargateID int64 `json:"stargate_id,omitempty"`
+		SystemID   int64 `json:"system_id,omitempty"`
 	} `json:"destination,omitempty"`
 }
 
 type Constellation struct {
-	ID       uint32   `json:"constellation_id,omitempty"`
+	ID       int64   `json:"constellation_id,omitempty"`
 	Name     string   `json:"name,omitempty"`
 	Position Position `json:"position,omitempty"`
-	RegionID uint32   `json:"region_id,omitempty"`
-	Systems  []uint32 `json:"systems,omitempty"`
+	RegionID int64   `json:"region_id,omitempty"`
+	Systems  []int64 `json:"systems,omitempty"`
 }
 
 type Region struct {
-	ID             uint32   `json:"region_id,omitempty"`
+	ID             int64   `json:"region_id,omitempty"`
 	Name           string   `json:"name,omitempty"`
 	Description    string   `json:"description,omitempty"`
-	Constellations []uint32 `json:"constellations,omitempty"`
+	Constellations []int64 `json:"constellations,omitempty"`
 }
 
 type Station struct {
-	ID                       uint32   `json:"station_id,omitempty"`
+	ID                       int64   `json:"station_id,omitempty"`
 	MaxDockableShipVolume    float32  `json:"max_dockable_ship_volume,omitempty"`
 	Name                     string   `json:"name,omitempty"`
 	OfficeRentalCost         float32  `json:"office_rental_cost,omitempty"`
-	Owner                    uint32   `json:"owner,omitempty"`
+	Owner                    int64   `json:"owner,omitempty"`
 	Position                 Position `json:"position,omitempty"`
-	RaceID                   uint32   `json:"race_id,omitempty"`
+	RaceID                   int64   `json:"race_id,omitempty"`
 	ReprocessingEfficiency   float32  `json:"reprocessing_efficiency,omitempty"`
 	ReprocessingStationsTake float32  `json:"reprocessing_stations_take,omitempty"`
 	Services                 []string `json:"services,omitempty"`
-	SystemID                 uint32   `json:"system_id,omitempty"`
-	TypeID                   uint32   `json:"type_id,omitempty"`
+	SystemID                 int64   `json:"system_id,omitempty"`
+	TypeID                   int64   `json:"type_id,omitempty"`
 }
 
 type Star struct {
@@ -102,10 +102,10 @@ type Star struct {
 	Luminosity    float32 `json:"luminosity,omitempty"`
 	Name          string  `json:"name,omitempty"`
 	Radius        uint64  `json:"radius,omitempty"`
-	SystemID      uint32  `json:"solar_system_id,omitempty"`
+	SystemID      int64  `json:"solar_system_id,omitempty"`
 	SpectralClass string  `json:"spectral_class,omitempty"`
-	Temperature   uint32  `json:"temperature,omitempty"`
-	TypeID        uint32  `json:"type_id,omitempty"`
+	Temperature   int64  `json:"temperature,omitempty"`
+	TypeID        int64  `json:"type_id,omitempty"`
 }
 
 // NameRef is a reference to a name that is returned from esi
@@ -116,14 +116,14 @@ type NameRef struct {
 }
 
 // GetTypeIds get a list of all type ids in the game
-func (esi Client) GetTypeIds() ([]uint32, error) {
-	return esi.getIds("/v1/universe/types/")
+func (esi Client) GetTypeIds() ([]int64, error) {
+	return esi.getIds("/universe/types/")
 }
 
 // GetType gets the types information from esi
-func (esi Client) GetType(id uint32) (UniverseType, error) {
+func (esi Client) GetType(id int64) (UniverseType, error) {
 	var item UniverseType
-	err := esi.get(fmt.Sprintf("/v3/universe/types/%d/", id), &item)
+	err := esi.get(fmt.Sprintf("/universe/types/%d/", id), &item)
 	if err != nil {
 		return UniverseType{}, err
 	}
@@ -131,21 +131,21 @@ func (esi Client) GetType(id uint32) (UniverseType, error) {
 	return item, nil
 }
 
-func (esi Client) GetSystems() ([]uint32, error) {
-	return esi.getIds("/latest/universe/systems/")
+func (esi Client) GetSystems() ([]int64, error) {
+	return esi.getIds("/universe/systems/")
 }
 
-func (esi Client) GetConstellations() ([]uint32, error) {
-	return esi.getIds("/latest/universe/constellations/")
+func (esi Client) GetConstellations() ([]int64, error) {
+	return esi.getIds("/universe/constellations/")
 }
 
-func (esi Client) GetRegions() ([]uint32, error) {
-	return esi.getIds("/latest/universe/regions/")
+func (esi Client) GetRegions() ([]int64, error) {
+	return esi.getIds("/universe/regions/")
 }
 
-func (esi Client) GetSystem(id uint32) (SolarSystem, error) {
+func (esi Client) GetSystem(id int64) (SolarSystem, error) {
 	var system SolarSystem
-	err := esi.get(fmt.Sprintf("/latest/universe/systems/%d/", id), &system)
+	err := esi.get(fmt.Sprintf("/universe/systems/%d/", id), &system)
 	if err != nil {
 		return SolarSystem{}, err
 	}
@@ -153,9 +153,9 @@ func (esi Client) GetSystem(id uint32) (SolarSystem, error) {
 	return system, nil
 }
 
-func (esi Client) GetConstellation(id uint32) (Constellation, error) {
+func (esi Client) GetConstellation(id int64) (Constellation, error) {
 	var constellation Constellation
-	err := esi.get(fmt.Sprintf("/latest/universe/constellations/%d/", id), &constellation)
+	err := esi.get(fmt.Sprintf("/universe/constellations/%d/", id), &constellation)
 	if err != nil {
 		return Constellation{}, err
 	}
@@ -163,9 +163,9 @@ func (esi Client) GetConstellation(id uint32) (Constellation, error) {
 	return constellation, nil
 }
 
-func (esi Client) GetRegion(id uint32) (Region, error) {
+func (esi Client) GetRegion(id int64) (Region, error) {
 	var region Region
-	err := esi.get(fmt.Sprintf("/latest/universe/regions/%d/", id), &region)
+	err := esi.get(fmt.Sprintf("/universe/regions/%d/", id), &region)
 	if err != nil {
 		return Region{}, err
 	}
@@ -173,9 +173,9 @@ func (esi Client) GetRegion(id uint32) (Region, error) {
 	return region, nil
 }
 
-func (esi Client) GetStargate(id uint32) (Stargate, error) {
+func (esi Client) GetStargate(id int64) (Stargate, error) {
 	var gate Stargate
-	err := esi.get(fmt.Sprintf("/latest/universe/stargates/%d/", id), &gate)
+	err := esi.get(fmt.Sprintf("/universe/stargates/%d/", id), &gate)
 	if err != nil {
 		return Stargate{}, err
 	}
@@ -183,9 +183,9 @@ func (esi Client) GetStargate(id uint32) (Stargate, error) {
 	return gate, nil
 }
 
-func (esi Client) GetStation(id uint32) (Station, error) {
+func (esi Client) GetStation(id int64) (Station, error) {
 	var station Station
-	err := esi.get(fmt.Sprintf("/latest/universe/stations/%d/", id), &station)
+	err := esi.get(fmt.Sprintf("/universe/stations/%d/", id), &station)
 	if err != nil {
 		return Station{}, err
 	}
@@ -193,9 +193,9 @@ func (esi Client) GetStation(id uint32) (Station, error) {
 	return station, nil
 }
 
-func (esi Client) GetStar(id uint32) (Star, error) {
+func (esi Client) GetStar(id int64) (Star, error) {
 	var star Star
-	err := esi.get(fmt.Sprintf("/latest/universe/stars/%d/", id), &star)
+	err := esi.get(fmt.Sprintf("/universe/stars/%d/", id), &star)
 	if err != nil {
 		return Star{}, err
 	}
@@ -210,7 +210,7 @@ func (esi Client) GetNames(ids []uint) (map[uint]NameRef, error) {
 	}
 
 	var names []NameRef
-	err = esi.post("/v3/universe/names/", buffer, &names)
+	err = esi.post("/universe/names/", buffer, &names)
 	if err != nil {
 		return nil, err
 	}

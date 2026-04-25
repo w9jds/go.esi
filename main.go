@@ -37,7 +37,7 @@ func authHeader(request *http.Request, token string) *http.Request {
 	return request
 }
 
-func (esi Client) get(path string, result interface{}) error {
+func (esi Client) get(path string, result any) error {
 	request, err := http.NewRequest("GET", baseURI+path, nil)
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (esi Client) get(path string, result interface{}) error {
 	return nil
 }
 
-func (esi Client) authGet(path string, token string, result interface{}) error {
+func (esi Client) authGet(path string, token string, result any) error {
 	request, err := http.NewRequest("GET", baseURI+path, nil)
 	if err != nil {
 		return err
@@ -74,7 +74,7 @@ func (esi Client) authGet(path string, token string, result interface{}) error {
 	return nil
 }
 
-func (esi Client) post(path string, content []byte, result interface{}) error {
+func (esi Client) post(path string, content []byte, result any) error {
 	request, err := http.NewRequest("POST", baseURI+path, bytes.NewBuffer(content))
 	if err != nil {
 		return err
@@ -93,7 +93,7 @@ func (esi Client) post(path string, content []byte, result interface{}) error {
 }
 
 func (esi Client) do(request *http.Request) ([]byte, error) {
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		delay := 5 * time.Second
 
 		response, error := esi.client.Do(request)
@@ -132,8 +132,8 @@ func (esi Client) do(request *http.Request) ([]byte, error) {
 	return nil, errors.New("failed esi requests 3 times, gave up")
 }
 
-func (esi Client) getIds(path string) ([]uint32, error) {
-	var ids []uint32
+func (esi Client) getIds(path string) ([]int64, error) {
+	var ids []int64
 	err := esi.get(path, &ids)
 	if err != nil {
 		return nil, err

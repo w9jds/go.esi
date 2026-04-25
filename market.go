@@ -7,21 +7,21 @@ import (
 // MarketGroup is a group that appears on the market
 type MarketGroup struct {
 	Description   string   `json:"description,omitempty"`
-	MarketGroupID uint32   `json:"market_group_id,omitempty"`
+	MarketGroupID int64   `json:"market_group_id,omitempty"`
 	Name          string   `json:"name,omitempty"`
-	ParentGroupID uint32   `json:"parent_group_id,omitempty"`
-	Types         []uint32 `json:"types,omitempty"`
+	ParentGroupID int64   `json:"parent_group_id,omitempty"`
+	Types         []int64 `json:"types,omitempty"`
 }
 
 // GetMarketGroupIds returns a list of all possible market group ids
-func (esi Client) GetMarketGroupIds() ([]uint32, error) {
-	return esi.getIds("/latest/markets/groups/")
+func (esi Client) GetMarketGroupIds() ([]int64, error) {
+	return esi.getIds("/markets/groups/")
 }
 
 // GetMarketGroup get the specified market group
-func (esi Client) GetMarketGroup(id uint32) (*MarketGroup, error) {
+func (esi Client) GetMarketGroup(id int64) (*MarketGroup, error) {
 	var group MarketGroup
-	error := esi.get(fmt.Sprintf("/v1/markets/groups/%d/", id), &group)
+	error := esi.get(fmt.Sprintf("/markets/groups/%d/", id), &group)
 	if error != nil {
 		return nil, error
 	}

@@ -7,7 +7,7 @@ import (
 
 type insurance struct {
 	Levels []coverageLevel `json:"levels,omitempty"`
-	TypeID uint32          `json:"type_id,omitempty"`
+	TypeID int64          `json:"type_id,omitempty"`
 }
 
 type coverageLevel struct {
@@ -27,9 +27,9 @@ type Coverage struct {
 }
 
 // GetShipInsurance gets all insurance values and filters out anything that isn't for the specified ShipID
-func (esi Client) GetShipInsurance(shipID uint32) (*Coverage, error) {
+func (esi Client) GetShipInsurance(shipID int64) (*Coverage, error) {
 	var ships []insurance
-	error := esi.get("/v1/insurance/prices/", &ships)
+	error := esi.get("/insurance/prices/", &ships)
 	if error != nil {
 		return nil, error
 	}
