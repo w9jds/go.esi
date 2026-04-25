@@ -72,7 +72,7 @@ func (esi Client) GetKillMail(killID int64, hash string, withFitting bool) (*Kil
 	}
 
 	if withFitting {
-		return &killmail, killmail.buildShipFitting(), nil
+		return &killmail, killmail.BuildShipFitting(), nil
 	}
 
 	return &killmail, nil, nil
@@ -87,7 +87,7 @@ func updateFittingItem(group map[int64]*KillItem, item KillItem) {
 	}
 }
 
-func (killmail KillMail) buildShipFitting() *KillFitting {
+func (killmail KillMail) BuildShipFitting() *KillFitting {
 	fit := &KillFitting{
 		SubSystemSlot: map[int64]*KillItem{},
 		HighSlot:      map[int64]*KillItem{},
