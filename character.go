@@ -7,15 +7,15 @@ import (
 
 // CharacterDetails references information from the character endpoint
 type CharacterDetails struct {
-	AllianceID     int64  `json:"alliance_id,omitempty"`
+	AllianceID     int64   `json:"alliance_id,omitempty"`
 	Birthday       string  `json:"birthday"`
-	BloodlineID    int64  `json:"bloodline_id,omitempty"`
-	CorporationID  int64  `json:"corporation_id"`
+	BloodlineID    int64   `json:"bloodline_id,omitempty"`
+	CorporationID  int64   `json:"corporation_id"`
 	Description    string  `json:"description,omitempty"`
-	FactionID      int64  `json:"faction_id,omitempty"`
+	FactionID      int64   `json:"faction_id,omitempty"`
 	Gender         string  `json:"gender"`
 	Name           string  `json:"name"`
-	RaceID         int64  `json:"race_id"`
+	RaceID         int64   `json:"race_id"`
 	SecurityStatus float32 `json:"security_status"`
 	Title          string  `json:"title"`
 }
@@ -61,20 +61,20 @@ type Roles struct {
 // Title represents a title
 type Title struct {
 	Name string `json:"name,omitempty"`
-	ID   int64 `json:"title_id,omitempty"`
+	ID   int64  `json:"title_id,omitempty"`
 }
 
 // CorporationHistory is a history record for a corp the character belonged to
 type CorporationHistory struct {
-	ID        int64 `json:"corporation_id,omitempty"`
+	ID        int64  `json:"corporation_id,omitempty"`
 	Deleted   bool   `json:"is_deleted,omitempty"`
-	RecordID  int64 `json:"record_id,omitempty"`
+	RecordID  int64  `json:"record_id,omitempty"`
 	StartDate string `json:"start_date,omitempty"`
 }
 
-func (esi Client) GetCharacterCorpHistory(characterID uint32) ([]CorporationHistory, error) {
+func (esi Client) GetCharacterCorpHistory(characterID int64) ([]CorporationHistory, error) {
 	var history []CorporationHistory
-	err := esi.get(fmt.Sprintf("/v2/characters/%d/corporationhistory/", characterID), &history)
+	err := esi.get(fmt.Sprintf("/characters/%d/corporationhistory/", characterID), &history)
 	if err != nil {
 		return []CorporationHistory{}, err
 	}
