@@ -18,7 +18,7 @@ type victim struct {
 	ID            int64     `json:"character_id,omitempty"`
 	AllianceID    int64     `json:"alliance_id,omitempty"`
 	CorporationID int64     `json:"corporation_id,omitempty"`
-	DamageTaken   uint64     `json:"damage_taken,omitempty"`
+	DamageTaken   int64     `json:"damage_taken,omitempty"`
 	Items         []KillItem `json:"items,omitempty"`
 	ShipTypeID    int64     `json:"ship_type_id,omitempty"`
 	Position      Position   `json:"position,omitempty"`
@@ -34,7 +34,7 @@ type attacker struct {
 	ID             int64  `json:"character_id,omitempty"`
 	AllianceID     int64  `json:"alliance_id,omitempty"`
 	CorporationID  int64  `json:"corporation_id,omitempty"`
-	DamageDone     uint64  `json:"damage_done,omitempty"`
+	DamageDone     int64  `json:"damage_done,omitempty"`
 	FinalBlow      bool    `json:"final_blow,omitempty"`
 	SecurityStatus float32 `json:"security_status,omitempty"`
 	ShipTypeID     int64  `json:"ship_type_id,omitempty"`
