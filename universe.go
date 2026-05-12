@@ -36,6 +36,14 @@ type UniverseType struct {
 	Volume          float32           `json:"volume,omitempty"`
 }
 
+type GroupInfo struct {
+	ID int64 `json:"group_id,omitempty"`
+	CategoryID int64 `json:"category_id,omitempty"`
+	Name string `json:"name,omitempty"`
+	Published bool `json:"published,omitempty"`
+	Types []int64 `json:"types,omitempty"`
+}
+
 type Planet struct {
 	AstroidBelts []int64 `json:"asteroid_belts,omitempty"`
 	Moons        []int64 `json:"moons,omitempty"`
@@ -129,6 +137,17 @@ func (esi Client) GetType(id int64) (UniverseType, error) {
 	}
 
 	return item, nil
+}
+
+// Gets information on an item group
+func (esi Client) GetGroup(id int64) (GroupInfo, error) {
+	var group GroupInfo
+	err := esi.get(fmt.Sprintf("/universe/groups/%d/", id), &group)
+	if err != nil {
+		return GroupInfo{}, err
+	}
+
+	return group, nil
 }
 
 func (esi Client) GetSystems() ([]int64, error) {
